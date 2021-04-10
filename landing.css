@@ -1,0 +1,90 @@
+body {
+    margin: 0%;
+    padding: 0%;
+}
+
+.container {
+    background: #282828;
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar {
+    background: #1D2021;
+    height: auto;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    background-color: #1D2021;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: block;
+    padding: 14px 16px;
+    text-align: center;
+    text-decoration: none;
+    color: #00FF57;
+}
+
+.active {
+    background-color: #00FF57;
+    color: #1D2021;
+}
+
+li a:hover:not(.active) {
+    background-color: #282828;
+}
+
+.question {
+    float: right;
+}
+
+.timerdiv {
+    padding: 13.5%;
+    display: flex;
+    justify-content: center;
+}
+
+.timer {
+    background: #00FF57;
+    padding: 4% 6%;
+    border-radius: 15%;
+}
+
+.timer p {
+    padding: 0%;
+    margin: 0%;
+    font-size: 200%;
+}
+
+.addtask {
+    background: #4B4B4B;
+    display: flex;
+    justify-content: center;
+    height: auto%;
+    padding: 2.5%;
+    align-items: center;
+}
+
+.addtask div {
+    background: #C4C4C4;
+    padding: 1% 2%;
+    border-radius: 10%;
+}
+.question img{
+    border:none;
+    width:40%;
+}
