@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>
+            Timer
+        </title>
+        <script>
+            var id = 0;
+            var globaltimer = null;
+            var defaultMinutes = 25;
+            var defaultLabel = "-- time taken by task --";
+
+            var Timer = (function() {
+                function Timer() {
+                    this.timerLengthInput = this.addInput("Minutes");
+                    this.initialMinutes = 25;
+                    this.initialMilliseconds = 0;
+                    this.minutes = this.initialMinutes;
+                    this.milliseconds = this.initialMilliseconds;
+                    this.running = false;
+                };
+
+                Timer.prototype.isInt = function (value) {
+                    return !isNaN(value) && 
+                            parseInt(Number(value)) == value && 
+                            !isNaN(parseInt(value, 10));
+                }
+
+                Timer.prototype.resetTimer = function() {
+                    if (this.timerLengthInput.value && this.timerLengthInput.value != "Minutes") {
+                        if (!this.isInt(this.timerLengthInput.value)) {
+                            alert("Please enter minute value as integer");
+                        } else {
+                            this.initialMinutes = this.timerLengthInput.value;
+                        }
+                    } else {
+                        this.initialMinutes = defaultMinutes;
+                    }
+                    this.minutes = this.initialMinutes;
+                    this.milliseconds = this.initialMilliseconds;
+                    this.getColons()[0].innerHTML = ":";
+                    this.running = false;
+                    this.updateView();
+                }
+
+                Timer.prototype.getMinutes = function() {
+                    return document.getElementsByClassName("minutes");
+                };
+
+                Timer.prototype.getColons = function() {
+                    return document.getElementsByClassName("colon");
+                }
+
+                Timer.prototype.getmilliseconds = function() {
+                    return document.getElementsByClassName("seconds");
+                }
+
+                Timer.prototype.updateView = function() {
+                    if (this.minutes < 10) {
+                        this.getMinutes()[0].innerHTML = "0" + this.minutes;
+                    } else {
+                        this.getMinutes()[0].innerHTML = this.minutes;
+                    }
+                    if (this.milliseconds < 10000) {
+                        this.getmilliseconds()[0].innerHTML = "0" + Math.floor(this.milliseconds / 1000);
+                    } else {
+                        this.getmilliseconds()[0].innerHTML = Math.floor(this.milliseconds / 1000);
+                    }
+                };
+
+                Timer.prototype.tick = function() {
+                    if (!this.running) {
+                        return;
+                    }
+                    this.milliseconds -= 500;
+                    if (this.milliseconds < 0) {
+                        this.minutes--;
+                        this.milliseconds = 59000;
+                        if (this.minutes < 0) {
+                            this.minutes = 0;
+                            this.milliseconds = 0;
+                            this.updateView();
+                            this.running = false;
+                            return;
+                        }
+                    }
+                    let colon = this.getColons()[0];
+                    if (colon.innerHTML == ":") {
+                        colon.innerHTML = " ";
+                    } else {
+                        colon.innerHTML = ":";
+                    }
+                    this.updateView();
+                }
+
+                Timer.prototype.addButton = function(label) {
+                    let button = document.createElement("button");
+                    button.innerHTML = label;
+                    document.getElementById("buttons").appendChild(button);
+                    return button;
+                }
+
+                Timer.prototype.addInput = function(name) {
+                    let input = document.createElement("input");
+                    input.setAttribute("name", name);
+                    input.setAttribute("onfocus", "if (this.value == '" + name + "') this.value = ''");
+                    input.setAttribute("onblur", "if (this.value == '') this.value = '" + name + "';");
+                    input.setAttribute("type", "text");
+                    input.setAttribute("value", name);
+                    document.getElementById("inputs").appendChild(input);
+                    return input;
+                }
+
+                Timer.prototype.init = function() {
+                    this.updateView();
+                    this.getColons()[0].innerHTML = ":";
+                    let start = this.addButton("Start timer");
+                    let pause = this.addButton("Pause timer");
+                    let reset = this.addButton("Reset timer");
+                    start.addEventListener("click", () => this.running = true);
+                    pause.addEventListener("click", () => this.running = false);
+                    reset.addEventListener("click", () => this.resetTimer());
+                    this.interval = setInterval(() => {
+                        this.tick();
+                    }, 500);
+                };
+
+                return Timer;
+            }());
+
+            function removeTask(id) {
+                var task = document.getElementById("task" + id);
+                var whenmade = task.getAttribute("whenmade");
+                document.getElementById("tasktimetaken").innerHTML = "'" + task.getAttribute("value") + "' took " + (Date.now() - whenmade) / 1000 + " seconds";
+                var tasklist = document.getElementById("tasks");
+                tasklist.removeChild(task);
+            }
+
+            function addTask() {
+                var input = document.getElementById("taskinput");
+                if (input.value == "" || input.value == "Task") {
+                    alert("Please enter the task");
+                    return;
+                }
+                var list = document.getElementById("tasks");
+                var newtask = document.createElement("li");
+                newtask.innerHTML = input.value;
+                newtask.setAttribute("id", "task" + id);
+                newtask.setAttribute("whenmade", Date.now());
+                newtask.setAttribute("value", input.value);
+                var removebutton = document.createElement("button");
+                removebutton.setAttribute("onclick", "removeTask(" + id + ")");
+                id++;
+                newtask.appendChild(removebutton);
+                list.appendChild(newtask);
+            }
+
+            window.onload = function() {
+                var timer = new Timer();
+                timer.init();
+                globaltimer = timer;
+                document.getElementById("tasktimetaken").innerHTML = defaultLabel;
+            };
+        </script>
+        <style>
+            #timer {
+                display: flex;
+            }
+            #buttons {
+                display: flex;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="timer">
+                <div class="minutes" align=left></div>
+                <div class="colon" align=center></div>
+                <div class="seconds" align=right></div>
+            </div>
+            <div id="buttons"></div>
+            <div id="inputs"></div>
+            <br>
+            <hr>
+            <br>
+            <div id="inputwrapper">
+                <input id="taskinput"
+                    onfocus="if (this.value == 'Task') this.value = ''"
+                    onblur="if (this.value == '') this.value='Task'" value="Task">
+                <button onclick="addTask()">Add task</button>
+            </div>
+            <div id="tasktimetaken"></div>
+            <ul id="tasks"></ul>
+        </div>
+    </body>
+</html>
